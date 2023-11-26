@@ -24,6 +24,10 @@ void FFTProcessor::processBlock(float* data, int numSamples, bool bypassed)
     for (int i = 0; i < numSamples; ++i) {
         data[i] = processSample(data[i], bypassed);
     }
+    //maxMagnitude = magnitudeRanker.percentile(0.99);
+    //using namespace std;
+    //cout << maxMagnitude << endl;
+    //maxMagnitude = 1024;
 }
 
 float FFTProcessor::processSample(float sample, bool bypassed)
@@ -116,8 +120,28 @@ void FFTProcessor::processSpectrum(float* data, int numBins)
         // Silly example where we change the phase of each frequency bin
         // somewhat randomly. Uncomment the following line to enable.
         //phase *= float(i);
+        //magnitudeRanker.observe(magnitude);
+        //magnitude = std::max(1.0f, 1 / magnitude);
+        //magnitude = std::min(0.0f, maxMagnitude - magnitude);
 
         // Convert magnitude and phase back into a complex number.
         cdata[i] = std::polar(magnitude, phase);
     }
+    
+    if(shiftBins > 0) {
+        for(int i = 0; i < numBins-shiftBins; i++) {
+            cdata[i] = cdata[i+shiftBins];
+        }
+        for(int i = numBins-shiftBins; i < numBins; i++) {
+            cdata[i] = 0;
+        }
+    }else if(shiftBins < 0) {
+        for(int i = numBins - 1; i >= -shiftBins; i--) {
+            cdata[i] = cdata[i + shiftBins];
+        }
+        for(int i = -shiftBins-1; i >= 0; i--) {
+            cdata[i] = 0;
+        }
+    }
+    
 }

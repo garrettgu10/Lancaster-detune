@@ -1,6 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "Ranker.hpp"
 
 /**
   STFT analysis and resynthesis of audio data.
@@ -17,6 +18,8 @@ public:
     void reset();
     float processSample(float sample, bool bypassed);
     void processBlock(float* data, int numSamples, bool bypassed);
+    
+    int shiftBins = 0;
 
 private:
     void processFrame(bool bypassed);
@@ -47,6 +50,9 @@ private:
 
     // The FFT working space. Contains interleaved complex numbers.
     std::array<float, fftSize * 2> fftData;
+    
+    Ranker<float, 10240> magnitudeRanker;
+    float maxMagnitude = 0; //99th percentile max
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FFTProcessor)
 };

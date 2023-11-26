@@ -126,9 +126,13 @@ void FFTExampleAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     }
 
     bool bypassed = apvts.getRawParameterValue("Bypass")->load();
+    int shiftAmt = apvts.getRawParameterValue("Shift")->load();
 
     float* channelL = buffer.getWritePointer(0);
     float* channelR = buffer.getWritePointer(1);
+    
+    fft[0].shiftBins = shiftAmt;
+    fft[1].shiftBins = shiftAmt;
 
     // Processing on a sample-by-sample basis:
     for (int sample = 0; sample < numSamples; ++sample) {
@@ -184,6 +188,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout FFTExampleAudioProcessor::cr
         juce::ParameterID("Bypass", 1),
         "Bypass",
         false));
+    
+    layout.add(std::make_unique<juce::AudioParameterInt>(
+        juce::ParameterID("Shift", 1),
+        "Shift (bins)", -10, 10, 0));
 
     return layout;
 }
